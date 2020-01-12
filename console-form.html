@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Console Interface</title>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <textarea id="output-element" rows="4" cols="50" style="width: 600px; height: 400px" readonly></textarea>
+    <br />
+    <input id="input-element" type="text" name="text" style="width: 500px;">
+    <button onclick="submitCommand()">Submit</button>
+    <script>
+        // Set up names for input and output elements
+        var outputElement = document.getElementById("output-element");
+        var inputElement = document.getElementById("input-element");
+
+        // Create a web socket connection
+        consoleSocket = new WebSocket('ws://127.0.0.1:8000');
+
+        // Routine to execute on successful connection
+        consoleSocket.onopen = function (event) {
+            var msg = "Web socket connected!\n"
+            appendOutputMessage(msg)
+        };
+
+        // Append received messages to console output
+        consoleSocket.onmessage = function (event) {
+            appendOutputMessage(event.data);
+        };
+
+        // Handle user input
+        function submitCommand() {
+            // Append command to output field
+            appendOutputCommand(inputElement.value);
+
+            // Send message to websockets server
+            sendMessage(inputElement.value);
+        };
+
+        // Send message server
+        function sendMessage(message) {
+            consoleSocket.send(message);
+        };
+
+        // Add output message to outputElement
+        function appendOutputMessage(message) {
+            outputElement.value = outputElement.value + message;
+        };
+
+        // Add user input to outputElement
+        function appendOutputCommand(message) {
+            outputElement.value = outputElement.value + "> " + message + '\n';
+        };
+    </script>
+</body>
+
+</html>
